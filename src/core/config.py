@@ -1,0 +1,30 @@
+import os
+from logging import config as logging_config
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from core.logger import LOGGING
+
+
+logging_config.dictConfig(LOGGING)
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
+    project_name: str = Field(..., alias="PROJECT_NAME")
+    postgres_url: str = Field(..., alias="POSTGRES_URL")
+    redis_host: str = Field(..., alias="REDIS_HOST")
+    redis_port: str = Field(..., alias="REDIS_PORT")
+    redis_password: str = Field(..., alias="REDIS_PASSWORD")
+    elastic_url: str = Field(..., alias="ELASTIC_URL")
+    elastic_schemes_path: str = Field(..., alias="ELASTIC_SCHEMES_PATH")
+    sql_file_root: str = Field(..., alias="SQL_SOURCE_ROOT")
+
+
+settings = Settings()
+
+ELASTIC_SCHEMES_PATH = BASE_DIR + settings.elastic_schemes_path
+SQL_FILE_ROOT = BASE_DIR + settings.sql_file_root
