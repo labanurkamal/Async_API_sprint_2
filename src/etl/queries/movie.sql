@@ -1,5 +1,5 @@
 SELECT
-fw.id::uuid as film_work_id,
+fw.id::text as film_work_id,
 fw.title,
 fw.description,
 STRING_AGG(DISTINCT p.id::text, ', ') as person_ids,

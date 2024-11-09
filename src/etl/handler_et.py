@@ -1,7 +1,6 @@
 import asyncio
 from collections import defaultdict
 from datetime import datetime
-import uuid
 
 import aiofiles
 import asyncpg
@@ -138,7 +137,7 @@ class PostgresTransform:
         genres = []
         for item in movie["genres"].split(", "):
             genre_id, genre_name = item.split(":")
-            genres.append(Genre(id=uuid.UUID(genre_id), name=genre_name))
+            genres.append(Genre(id=genre_id, name=genre_name))
 
         return genres
 
@@ -161,7 +160,7 @@ class PostgresTransform:
         for person_id, name_role in zip_person_data:
             full_name, role = name_role
             if role in roles:
-                roles[role].append(Person(id=uuid.UUID(person_id), full_name=full_name))
+                roles[role].append(Person(id=person_id, full_name=full_name))
 
         return roles
 
@@ -172,7 +171,9 @@ async def handler_et_process() -> zip:
     для дальнейшей загрузки в Elasticsearch.
     """
     modified_time = datetime.strptime("1978.04.03", "%Y.%m.%d")
+
     pool = await asyncpg.create_pool(settings.postgres_url)
+    print(pool)
 
     try:
         data = PostgresTransform(pool, modified_time=modified_time, batch_size=100)

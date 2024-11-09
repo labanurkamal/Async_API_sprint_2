@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Optional
+from typing import Optional, Literal
 
 from fastapi import APIRouter, Depends, Query
 
@@ -7,7 +7,6 @@ from . import validators
 from .models import ShortFilm
 from models.models import Film
 from services.film import FilmService, get_film_service
-
 
 router = APIRouter()
 
@@ -25,7 +24,7 @@ router = APIRouter()
 async def get_popular_or_by_genre_films(
     film_service: FilmService = Depends(get_film_service),
     genre: Optional[str] = Query(None, description="ID жанра для фильтрации фильмов"),
-    sort: Optional[str] = Query(
+    sort: Optional[Literal["-imdb_rating", "imdb_rating"]] = Query(
         "-imdb_rating",
         description="Поле для сортировки фильмов. Используйте '-' для обратного порядка.",
     ),
@@ -67,7 +66,7 @@ async def get_popular_or_by_genre_films(
 )
 async def get_film_search(
     film_service: FilmService = Depends(get_film_service),
-    query: Optional[str] = Query(None, description="Поисковый запрос для фильмов"),
+    query: str = Query(..., description="Поисковый запрос для фильмов"),
     page_size: Optional[int] = Query(
         50, ge=1, description="Количество фильмов на странице"
     ),

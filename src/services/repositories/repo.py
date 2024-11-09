@@ -1,10 +1,10 @@
 import json
 from typing import Any, Union
+
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from redis.asyncio import Redis
 
 from .interfaces import CacheInterface, StorageInterface
-
 
 
 class RedisCache(CacheInterface):
@@ -17,7 +17,6 @@ class RedisCache(CacheInterface):
             return None
 
         return json.loads(cached_data)
-
 
     async def set(self, **kwargs: Any) -> None:
         await self.redis.set(**kwargs)
@@ -34,11 +33,11 @@ class ElasticStorage(StorageInterface):
             return None
 
         return doc["_source"]
-    
+
     async def search(self, **kwargs: Any) -> Union[list[dict[str, Any]], None]:
         try:
             docs = await self.elastic.search(**kwargs)
         except NotFoundError:
             return None
-        
+
         return docs["hits"]["hits"]

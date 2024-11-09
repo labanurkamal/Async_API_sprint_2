@@ -1,4 +1,3 @@
-import uuid
 from typing import Optional
 
 from pydantic import BaseModel, Field, confloat
@@ -9,7 +8,7 @@ from models.models import Person
 class UUIDMixin(BaseModel):
     """Миксин для добавления UUID в качестве поля `id` с генерацией уникального идентификатора по умолчанию."""
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    id: str
 
 
 class ShortFilm(UUIDMixin):

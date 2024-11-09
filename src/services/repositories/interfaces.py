@@ -4,18 +4,15 @@ from typing import Optional, Any, Union, TypeVar, Generic
 T = TypeVar("T")
 
 
-
 class CacheInterface(ABC):
 
     @abstractmethod
     async def get(self, **kwargs: Any) -> Union[dict[str, Any], None]:
         pass
 
-
     @abstractmethod
     async def set(self, **kwargs: Any) -> None:
         pass
-
 
 
 class StorageInterface(ABC):

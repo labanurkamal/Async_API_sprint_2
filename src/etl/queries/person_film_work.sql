@@ -1,7 +1,7 @@
 SELECT
-pfw.person_id::uuid AS id,
+pfw.person_id::text AS id,
 p.full_name AS full_name,
-fw.id::uuid as film_work_id,
+fw.id::text as film_work_id,
 fw.title as title,
 fw.rating as imdb_rating,
 STRING_AGG(DISTINCT pfw.role, ', ') AS roles

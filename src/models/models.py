@@ -1,5 +1,4 @@
 from typing import Optional
-import uuid
 
 from pydantic import BaseModel, Field, confloat
 
@@ -7,7 +6,7 @@ from pydantic import BaseModel, Field, confloat
 class UUIDMixin(BaseModel):
     """Миксин для добавления UUID в качестве поля `id` с генерацией уникального идентификатора по умолчанию."""
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    id: str
 
 
 class Genre(UUIDMixin):

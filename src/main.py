@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 from elasticsearch import AsyncElasticsearch
@@ -9,24 +8,23 @@ from redis.asyncio import Redis
 from api.v1 import films, genres, persons
 from core.config import settings
 from db import elastic, redis
-from etl.es_loader import load_data_to_elasticsearch
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis.redis = Redis(
-        host=settings.redis_host, port=settings.redis_port, password=settings.redis_password
+        host=settings.redis_host,
+        port=settings.redis_port,
+        password=settings.redis_password,
     )
     elastic.es = AsyncElasticsearch(hosts=[settings.elastic_url])
-
-    await asyncio.sleep(40)
-    await load_data_to_elasticsearch(elastic.es)
 
     try:
         yield
     finally:
         await redis.redis.close()
         await elastic.es.close()
+
 
 app = FastAPI(
     lifespan=lifespan,

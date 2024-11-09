@@ -18,7 +18,7 @@ router = APIRouter()
 )
 async def get_person_search(
     person_service: PersonServices = Depends(get_person_service),
-    query: Optional[str] = Query(None, description="Имя персонажа для поиска."),
+    query: Optional[str] = Query(..., description="Имя персонажа для поиска."),
     page_number: Optional[int] = Query(
         1, ge=1, description="Номер страницы для пагинации."
     ),
