@@ -65,6 +65,5 @@ services:
        - redis-storage:/data
 
 volumes:
-   static_volume:
    redis-storage:
    esdata:

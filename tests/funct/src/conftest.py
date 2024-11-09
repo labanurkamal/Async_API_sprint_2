@@ -1,4 +1,5 @@
 import asyncio
+
 import aiohttp
 import pytest_asyncio
 from elasticsearch import AsyncElasticsearch

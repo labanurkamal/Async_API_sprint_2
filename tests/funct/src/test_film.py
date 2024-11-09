@@ -12,7 +12,7 @@ SCHEME = test_settings.es_settings.get_indices_mapping()[INDEX]
 
 
 @pytest.mark.asyncio
-class TestFilmSuccess:
+class TestFilm:
     """
     Набор тестов для проверки успешной работы API, связанного с фильмами.
     Тесты включают:
