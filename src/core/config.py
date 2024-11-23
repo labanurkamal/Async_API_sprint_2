@@ -1,12 +1,11 @@
 import os
 from logging import config as logging_config
-from dotenv import find_dotenv
 
+from dotenv import find_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from core.logger import LOGGING
-
 
 logging_config.dictConfig(LOGGING)
 

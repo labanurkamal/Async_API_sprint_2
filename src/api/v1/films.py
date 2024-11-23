@@ -1,12 +1,16 @@
 from http import HTTPStatus
-from typing import Optional, Literal
+from typing import Literal, Optional
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query
+
+from dependencies.container import ServiceContainer
+from models.models import Film
+from services.film import FilmService
 
 from . import validators
 from .models import ShortFilm
-from models.models import Film
-from services.film import FilmService, get_film_service
+from .paginations import PaginationParams
 
 router = APIRouter()
 
@@ -21,17 +25,15 @@ router = APIRouter()
     },
     response_model=list[ShortFilm],
 )
+@inject
 async def get_popular_or_by_genre_films(
-    film_service: FilmService = Depends(get_film_service),
+    film_service: FilmService = Depends(Provide[ServiceContainer.film_service]),
     genre: Optional[str] = Query(None, description="ID жанра для фильтрации фильмов"),
     sort: Optional[Literal["-imdb_rating", "imdb_rating"]] = Query(
         "-imdb_rating",
         description="Поле для сортировки фильмов. Используйте '-' для обратного порядка.",
     ),
-    page_size: Optional[int] = Query(
-        50, ge=1, description="Количество фильмов на странице"
-    ),
-    page_number: Optional[int] = Query(1, ge=1, description="Номер страницы"),
+    pg: PaginationParams = Depends(PaginationParams),
 ) -> list[ShortFilm]:
     query = {
         "query": {
@@ -45,8 +47,8 @@ async def get_popular_or_by_genre_films(
         "sort": [
             {sort.lstrip("-"): {"order": "desc" if sort.startswith("-") else "asc"}}
         ],
-        "from": page_size * (page_number - 1),
-        "size": page_size,
+        "from": pg.page_size * (pg.page_number - 1),
+        "size": pg.page_size,
     }
     list_film = await film_service.get_by_search(query)
     validators.http_exception(list_film, HTTPStatus.NOT_FOUND, "Фильмы не найдены")
@@ -64,18 +66,16 @@ async def get_popular_or_by_genre_films(
     },
     response_model=list[ShortFilm],
 )
+@inject
 async def get_film_search(
-    film_service: FilmService = Depends(get_film_service),
+    film_service: FilmService = Depends(Provide[ServiceContainer.film_service]),
     query: str = Query(..., description="Поисковый запрос для фильмов"),
-    page_size: Optional[int] = Query(
-        50, ge=1, description="Количество фильмов на странице"
-    ),
-    page_number: Optional[int] = Query(1, ge=1, description="Номер страницы"),
+    pg: PaginationParams = Depends(PaginationParams),
 ) -> list[ShortFilm]:
     search_query = {
         "query": {"multi_match": {"query": query, "fields": ["title", "description"]}},
-        "from": page_size * (page_number - 1),
-        "size": page_size,
+        "from": pg.page_size * (pg.page_number - 1),
+        "size": pg.page_size,
     }
 
     film = await film_service.get_by_search(search_query)
@@ -95,8 +95,10 @@ async def get_film_search(
     },
     response_model=Film,
 )
+@inject
 async def get_film_details(
-    film_id: str, film_service: FilmService = Depends(get_film_service)
+    film_id: str,
+    film_service: FilmService = Depends(Provide[ServiceContainer.film_service]),
 ) -> Film:
     film = await film_service.get_by_id(film_id)
     validators.http_exception(film, HTTPStatus.NOT_FOUND, "Фильм не найден.")

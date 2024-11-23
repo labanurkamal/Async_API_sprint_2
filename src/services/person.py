@@ -1,26 +1,22 @@
-from functools import lru_cache
+from typing import Any, Optional
 
-from elasticsearch import AsyncElasticsearch
-from fastapi import Depends
-from redis.asyncio import Redis
-
-from .repositories.repo import RedisCache, ElasticStorage
-from db.elastic import get_elastic
-from db.redis import get_redis
+from dependencies.register import RepositoryFactory
 from models.models import PersonFilm
-from services.services import BaseService
+from services.services import BaseInterface
+
+INDEX = "persons"
 
 
-class PersonServices(BaseService[PersonFilm]):
-    def __init__(self, redis: RedisCache, elastic: ElasticStorage):
-        super().__init__(redis, elastic)
-        self._index = "persons"
-        self._model = PersonFilm
+class PersonService(BaseInterface):
+    """Сервис для выполнения операций с данными персон."""
 
+    def __init__(self, repository: RepositoryFactory[PersonFilm]):
+        self.repository = repository.create(PersonFilm)
 
-@lru_cache()
-def get_person_service(
-    redis: Redis = Depends(get_redis),
-    elastic: AsyncElasticsearch = Depends(get_elastic),
-):
-    return PersonServices(RedisCache(redis), ElasticStorage(elastic))
+    async def get_by_id(self, person_id: str) -> PersonFilm:
+        """Получает данные персоны по её идентификатору."""
+        return await self.repository.get_by_id(index_name=INDEX, obj_id=person_id)
+
+    async def get_by_search(self, query: Optional[dict[str, Any]]) -> list[PersonFilm]:
+        """Выполняет поиск персон по запросу."""
+        return await self.repository.get_by_search(index_name=INDEX, body=query)

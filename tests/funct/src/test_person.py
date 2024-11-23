@@ -127,7 +127,10 @@ class TestPerson:
             ),
             (
                 {"person_id": str(uuid.uuid4())},
-                {"status": HTTPStatus.NOT_FOUND, "detail": "Персонаж не найден."},
+                {
+                    "status": HTTPStatus.NOT_FOUND,
+                    "detail": "Фильмов персонажа не найден.",
+                },
             ),
         ],
     )

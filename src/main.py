@@ -1,29 +1,34 @@
 from contextlib import asynccontextmanager
 
-from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from redis.asyncio import Redis
 
 from api.v1 import films, genres, persons
 from core.config import settings
-from db import elastic, redis
+from dependencies.container import CoreContainer, ServiceContainer
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis.redis = Redis(
-        host=settings.redis_host,
-        port=settings.redis_port,
-        password=settings.redis_password,
-    )
-    elastic.es = AsyncElasticsearch(hosts=[settings.elastic_url])
 
+    core_container = CoreContainer()
+    service_container = ServiceContainer()
+
+    app.core_container = core_container
+    app.service_container = service_container
+
+    service_container.wire(
+        modules=[
+            "api.v1.films",
+            "api.v1.genres",
+            "api.v1.persons",
+        ]
+    )
     try:
         yield
     finally:
-        await redis.redis.close()
-        await elastic.es.close()
+        await core_container.redis_client().close()
+        await core_container.elastic_client().close()
 
 
 app = FastAPI(

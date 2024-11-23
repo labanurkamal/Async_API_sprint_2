@@ -5,7 +5,6 @@ import pytest
 
 from funct.settings import test_settings
 
-
 FILM_PATH_ROOT = f"{test_settings.service_settings.get_api_v1()}/films"
 INDEX = "movies"
 SCHEME = test_settings.es_settings.get_indices_mapping()[INDEX]
@@ -136,9 +135,9 @@ class TestFilm:
             assert status == expected_answer["status"]
 
             if status == HTTPStatus.UNPROCESSABLE_ENTITY:
-                assert expected_answer["detail"]["msg"] == [
-                    detail["msg"] for detail in body["detail"]
-                ]
+                assert sorted(expected_answer["detail"]["msg"]) == sorted(
+                    [detail["msg"] for detail in body["detail"]]
+                )
             elif body:
                 assert body == sorted(
                     body,

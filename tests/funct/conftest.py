@@ -6,9 +6,13 @@ from elasticsearch import AsyncElasticsearch
 from elasticsearch.helpers import async_bulk
 
 from funct.settings import test_settings
-from funct.src.fixtures.person_fixture import es_person_data
-from funct.src.fixtures.genre_fixtures import es_genre_data
-from funct.src.fixtures.film_fixtures import es_film_data
+
+pytest_plugins = (
+    "funct.fixtures.film_fixtures",
+    "funct.fixtures.genre_fixtures",
+    "funct.fixtures.person_fixtures",
+)
+
 
 ES_HOSTS = test_settings.es_settings.get_url()
 

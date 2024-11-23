@@ -1,26 +1,22 @@
-from functools import lru_cache
+from typing import Any, Optional
 
-from elasticsearch import AsyncElasticsearch
-from fastapi import Depends
-from redis.asyncio import Redis
-
-from .repositories.repo import RedisCache, ElasticStorage
-from db.elastic import get_elastic
-from db.redis import get_redis
+from dependencies.register import RepositoryFactory
 from models.models import Film
-from services.services import BaseService
+from services.services import BaseInterface
+
+INDEX = "movies"
 
 
-class FilmService(BaseService[Film]):
-    def __init__(self, redis: RedisCache, elastic: ElasticStorage):
-        super().__init__(redis, elastic)
-        self._index = "movies"
-        self._model = Film
+class FilmService(BaseInterface):
+    """Сервис для выполнения операций с данными фильмов."""
 
+    def __init__(self, repository: RepositoryFactory[Film]):
+        self.repository = repository.create(Film)
 
-@lru_cache()
-def get_film_service(
-    redis: Redis = Depends(get_redis),
-    elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> FilmService:
-    return FilmService(RedisCache(redis), ElasticStorage(elastic))
+    async def get_by_id(self, film_id: str) -> Film:
+        """Получает данные фильма по его идентификатору."""
+        return await self.repository.get_by_id(index_name=INDEX, obj_id=film_id)
+
+    async def get_by_search(self, query: Optional[dict[str, Any]]) -> list[Film]:
+        """Выполняет поиск фильмов по запросу."""
+        return await self.repository.get_by_search(index_name=INDEX, body=query)

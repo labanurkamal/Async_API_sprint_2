@@ -5,7 +5,7 @@ from datetime import datetime
 import aiofiles
 import asyncpg
 
-from core.config import settings, SQL_FILE_ROOT
+from core.config import SQL_FILE_ROOT, settings
 from models.models import Film, Genre, Person, PersonFilm
 
 
@@ -173,7 +173,6 @@ async def handler_et_process() -> zip:
     modified_time = datetime.strptime("1978.04.03", "%Y.%m.%d")
 
     pool = await asyncpg.create_pool(settings.postgres_url)
-    print(pool)
 
     try:
         data = PostgresTransform(pool, modified_time=modified_time, batch_size=100)
@@ -189,3 +188,7 @@ async def handler_et_process() -> zip:
 
     finally:
         await pool.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(handler_et_process())
