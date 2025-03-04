@@ -6,11 +6,11 @@ from fastapi.responses import ORJSONResponse
 from api.v1 import films, genres, persons
 from core.config import settings
 from dependencies.container import CoreContainer, ServiceContainer
+from src.etl.es_loader import load_data_to_elasticsearch
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
     core_container = CoreContainer()
     service_container = ServiceContainer()
 
@@ -24,6 +24,8 @@ async def lifespan(app: FastAPI):
             "api.v1.persons",
         ]
     )
+
+    await load_data_to_elasticsearch(core_container.elastic_client())
     try:
         yield
     finally:
