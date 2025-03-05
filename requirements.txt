@@ -2,6 +2,6 @@ asyncpg==0.29.0
 aiofiles==24.1.0
 dependency-injector==4.43.0
 fastapi==0.111.0
-elasticsearch[async]==8.13.2
+elasticsearch[async]==7.10.1
 redis==5.0.4
 pydantic-settings==2.5.2

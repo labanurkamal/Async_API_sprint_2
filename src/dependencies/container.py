@@ -15,13 +15,16 @@ class CoreContainer(containers.DeclarativeContainer):
     """Предоставляет основные ресурсы, такие как клиенты Redis и Elasticsearch, а также экземпляры репозиториев."""
 
     config = providers.Singleton(Settings)
-
     redis_client = providers.Singleton(
-        Redis,
-        host=config.provided.redis_host,
-        port=config.provided.redis_port,
-        password=config.provided.redis_password,
+        lambda: Redis.from_url("redis://default:wlmInXIYHtxsDNfgaoyTNCEeRbhsRhUx@switchyard.proxy.rlwy.net:20728")
     )
+    # redis_client = providers.Singleton(
+    #     Redis,
+    #     host=config.provided.redis_host,
+    #     port=config.provided.redis_port,
+    #     password=config.provided.redis_password,
+    # )
+
     elastic_client = providers.Singleton(
         AsyncElasticsearch, hosts=config.provided.elastic_url
     )

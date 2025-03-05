@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     redis_host: str = Field(..., alias="REDIS_HOST")
     redis_port: str = Field(..., alias="REDIS_PORT")
     redis_password: str = Field(..., alias="REDIS_PASSWORD")
+    redis_url: str = Field(..., alias="REDIS_URL")
     elastic_url: str = Field(..., alias="ELASTIC_URL")
     elastic_schemes_path: str = Field(..., alias="ELASTIC_SCHEMES_PATH")
     sql_file_root: str = Field(..., alias="SQL_SOURCE_ROOT")
