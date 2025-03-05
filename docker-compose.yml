@@ -32,7 +32,7 @@ services:
     ports:
       - "9200:9200"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://elasticsearch:9200/_cluster/health" ]
+      test: [ "CMD", "curl", "-f", "http://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=5s" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,7 +47,6 @@ services:
     volumes:
       - redis-storage:/data
 
-
   movies_content:
     build: .
     container_name: movies_content
@@ -56,9 +55,15 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
-      - movies_db
-      - elasticsearch
+      movies_db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://movies_content:8000/api/v1/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:latest
