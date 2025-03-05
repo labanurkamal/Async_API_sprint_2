@@ -48,7 +48,9 @@ services:
       - redis-storage:/data
 
   movies_content:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     container_name: movies_content
     ports:
     - "8000:8000"
