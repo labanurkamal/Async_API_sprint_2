@@ -6,10 +6,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/opt/app/src/
 
-COPY ../requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip --no-cache-dir \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY .. .
+COPY . .
 
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

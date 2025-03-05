@@ -29,7 +29,7 @@ htmlcov/
 .ipynb_checkpoints
 
 # Docker files
-docker/Dockerfile
+Dockerfile
 docker-compose*.yml
 
 # IDE / editor files
