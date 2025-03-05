@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import films, genres, persons
+from api.v1 import films, genres, persons, healthcheck
 from core.config import settings
 from dependencies.container import CoreContainer, ServiceContainer
 from src.etl.es_loader import load_data_to_elasticsearch
@@ -44,3 +44,4 @@ app = FastAPI(
 app.include_router(films.router, prefix="/api/v1/films", tags=["FILMS"])
 app.include_router(genres.router, prefix="/api/v1/genres", tags=["GENRES"])
 app.include_router(persons.router, prefix="/api/v1/persons", tags=["PERSONS"])
+app.include_router(healthcheck.router, prefix="/api/v1/healthcheck", tags=["HEALTHCHECK"])
