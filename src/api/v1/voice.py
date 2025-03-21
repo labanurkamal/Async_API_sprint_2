@@ -18,17 +18,20 @@ async def voice(
     request: YandexVoiceRequest,
     ai_class: IntentNerClass = Depends(get_intent_ner_class)
 ):
-    response_text = "Привет! Это тестовый ответ от сервера."
+    text = request.request.get("original_utterance", "")
 
-    text = request["request"]["original_utterance"]
-    intent = ai_class.model_intent(text)
-    request["request"]["nlu"]["intents"] = intent
-    logging.info(request)
+    try:
+        intent = ai_class.model_intent(text)
+        request.request["nlu"]["intents"] = intent
+    except Exception as e:
+        logging.error(f"Ошибка в AI модели: {e}")
+        intent = {}
+
     return {
         "version": request.version,
         "session": request.session,
         "response": {
-            "text": response_text,
+            "text": "Привет! Это тестовый ответ от сервера.",
             "end_session": False
         }
     }
