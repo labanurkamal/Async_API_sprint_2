@@ -31,7 +31,7 @@ async def voice(
         "version": request.version,
         "session": request.session,
         "response": {
-            "text": "Привет! Это тестовый ответ от сервера.",
+            "text": intent,
             "end_session": False
         }
     }
