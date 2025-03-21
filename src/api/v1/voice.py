@@ -4,7 +4,7 @@ from typing import Dict, Any
 from fastapi import APIRouter, Request, Depends
 from pydantic import BaseModel
 
-from services.ai import get_intent_ner_class, IntentNerClass
+from services.ai import AIService, get_ai_service
 router = APIRouter()
 
 class YandexVoiceRequest(BaseModel):
@@ -16,22 +16,17 @@ class YandexVoiceRequest(BaseModel):
 @router.post("/yandex")
 async def voice(
     request: YandexVoiceRequest,
-    ai_class: IntentNerClass = Depends(get_intent_ner_class)
+    ai_service: AIService = Depends(get_ai_service)
 ):
     text = request.request.get("original_utterance", "")
 
-    try:
-        intent = ai_class.model_intent(text)
-        request.request["nlu"]["intents"] = intent
-    except Exception as e:
-        logging.error(f"Ошибка в AI модели: {e}")
-        intent = {}
+    response = ai_service.process_request(text)
 
     return {
         "version": request.version,
         "session": request.session,
         "response": {
-            "text": intent,
+            "text": response,
             "end_session": False
         }
     }
