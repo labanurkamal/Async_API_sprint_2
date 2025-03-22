@@ -2,89 +2,118 @@ import os
 import logging
 import spacy
 from fastapi import Depends
+from .services import BaseInterface
+from .film import FilmService
+from .person import PersonService
+from schemas.ai_schema import IntentFields, EntityType
 
 INTENT_MODEL_PATH = "/opt/app/src/output/intent/output_intent/model-best"
 NER_MODEL_PATH = "/opt/app/src/output/ner/model-best"
 
 
 class IntentNERModel:
-
-    def model_path_exists(self, model_path: str) -> None:
-        try:
-            if not os.path.exists(model_path):
-                raise FileNotFoundError
-        except FileNotFoundError:
-            logging.error(f"Model path {model_path} not found.")
-
-    def load_model(self, model_path: str):
-        self.model_path_exists(model_path)
-        return spacy.load(model_path)
+    def __init__(self):
+        self.intent_nlp = spacy.load(INTENT_MODEL_PATH)
+        self.ner_nlp = spacy.load(NER_MODEL_PATH)
 
     def model_intent(self, text):
-        nlp = self.load_model(INTENT_MODEL_PATH)
-        doc = nlp(text)
+        doc = self.intent_nlp(text)
 
         scores = {k: v for k, v in doc.cats.items()}
-        predicted_category = max(scores.items(), key=lambda x: x[1])
-        print(f"Текст: {text}")
-        print(f"Распознанная категория: {predicted_category[0]}")
+        predicted_category = max(scores.items(), key=lambda x: x[1])[0]
 
-        return predicted_category[0]
+        return predicted_category
 
     def model_entities(self, text):
-        nlp = self.load_model(NER_MODEL_PATH)
-
-        doc = nlp(text)
+        doc = self.ner_nlp(text)
         entities = {ent.text: ent.label_ for ent in doc.ents}
-        print(f"Текст: {text}")
-        print(f"Распознанные сущности: {entities}")
+
         return entities
 
 
 class AIService:
-    def __init__(self, intent_ner_model: IntentNERModel):
+    def __init__(
+        self,
+        film_service,
+        person_service,
+        intent_ner_model,
+    ):
+        self.film_service = film_service
+        self.person_service = person_service
         self.intent_ner_model = intent_ner_model
 
-    def extract_entities(self, text: str):
-        return self.intent_ner_model.model_entities(text)
-
-    def define_intent(self, text: str):
-        return self.intent_ner_model.model_intent(text)
-
-    def process_request(self, text: str):
-        entities = self.extract_entities(text)
-        intent = self.define_intent(text)
-
-        return self.handle_request(entities, intent)
-
-    def handle_request(self, entities, intent):
+    async def handle_request(self, entities, intent):
 
         if not intent:
             return "Не удалось определить намерение."
 
         INTENT_HANDLERS = {
-            "film_description": ("FILM", "Описание фильма {name}: ..."),
-            "film_rating": ("FILM", "Рейтинг фильма {name}: 8.5/10"),
-            "actor_info": ("PERSON", "Информация актера {name}: ..."),
-            "director_info": ("PERSON", "Информация режиссёра {name}: ..."),
-            "writer_info": ("PERSON", "Информация сценари́ста {name}: ..."),
-            "actor_movies": ("PERSON", "Вот фильмы, в которых снимался {name}: ..."),
-            "director_movies": ("PERSON", "Вот фильмы, снятые {name}: ..."),
+            "film_description": "Описание фильма {name}: ...",
+            "film_rating": "Рейтинг фильма {name}:",
+            "actor_info": "Информация актера {name}: ...",
+            "director_info": "Информация режиссёра {name}: ...",
+            "writer_info": "Информация сценари́ста {name}: ...",
+            "actor_movies": "Вот фильмы, в которых снимался {name}: ...",
+            "director_movies": "Вот фильмы, снятые {name}: ...",
         }
 
         if intent not in INTENT_HANDLERS:
             return "Я пока не умею отвечать на такие вопросы."
 
-        entity_type, response_template = INTENT_HANDLERS[intent]
-        entity_name = self.get_entity_by_type(entities, entity_type)
+        entity_name, entity_type = next(iter(entities.items()))
 
-        return response_template.format(name=entity_name) if entity_name else f"Не найдено {entity_type.lower()} в запросе."
+        es_query = await self.es_query(query=entity_name, entity_type=entity_type)
+        print('es_query', es_query)
+
+        response_template = INTENT_HANDLERS[intent]
+        intent_field = IntentFields[intent].value
+
+        result = await self.get_result(entity_type, es_query, intent_field)
+
+        return response_template.format(name=result)
+
+    async def get_result(self, entity_type, es_query, intent_field):
+        service = await self.define_service(entity_type)
+        search = await service.get_by_search(es_query)
+
+        if not search:
+            return "Данные не найдены."
+
+        # Если ищем фильмы, извлекаем их названия
+        if entity_type == "FILM":
+            return ", ".join([item.title for item in search])
+
+        # Извлекаем нужное поле, учитывая возможность списка
+        results = []
+        for item in search:
+            value = getattr(item, intent_field, "Нет данных")
+            print("VALUE:", value)
+            if isinstance(value, list):
+                value = ", ".join([item.title for item in value])
+                print("VALUE LIST:", value)
+            results.append(value)
+
+        return ", ".join(results)
+
+    async def define_service(self, entity_type) -> BaseInterface:
+        if entity_type == EntityType.PERSON:
+            return self.person_service
+        elif entity_type == EntityType.FILM:
+            return self.film_service
 
     @staticmethod
-    def get_entity_by_type(entities, entity_type):
-        return next((name for name, type_ in entities.items() if type_==entity_type), None)
+    async def es_query(query, entity_type):
+        if entity_type == EntityType.PERSON:
+            fields = 'full_name'
+        elif entity_type == EntityType.FILM:
+            fields = 'title'
+        else:
+            fields = None
+        return {"query": {"multi_match": {"query": query, "fields": [fields]}}}
 
-def get_ai_service() -> AIService:
-    intent_ner_model: IntentNERModel = IntentNERModel()
-    return AIService(intent_ner_model=intent_ner_model)
+    async def process_request(self, text: str):
+        entities = self.intent_ner_model.model_entities(text)
+        intent = self.intent_ner_model.model_intent(text)
 
+        print(entities, intent)
+        return await self.handle_request(entities, intent)

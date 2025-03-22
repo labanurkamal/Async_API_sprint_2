@@ -9,6 +9,7 @@ from services.film import FilmService
 from services.genre import GenreService
 from services.person import PersonService
 from services.storage import ElasticStorageRepository
+from services.ai import IntentNERModel, AIService
 
 
 class CoreContainer(containers.DeclarativeContainer):
@@ -45,3 +46,10 @@ class ServiceContainer(containers.DeclarativeContainer):
     film_service = providers.Factory(FilmService, repository=repository_factory)
     genre_service = providers.Factory(GenreService, repository=repository_factory)
     person_service = providers.Factory(PersonService, repository=repository_factory)
+    intent_ner_model = providers.Singleton(IntentNERModel)
+    ai_service = providers.Singleton(
+        AIService,
+        film_service=film_service,
+        person_service=person_service,
+        intent_ner_model=intent_ner_model,
+    )

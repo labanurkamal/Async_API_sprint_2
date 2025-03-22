@@ -1,10 +1,12 @@
 import logging
 from typing import Dict, Any
+from dependency_injector.wiring import Provide, inject
+from dependencies.container import ServiceContainer
 
 from fastapi import APIRouter, Request, Depends
 from pydantic import BaseModel
 
-from services.ai import AIService, get_ai_service
+# from services.ai import AIService
 router = APIRouter()
 
 class YandexVoiceRequest(BaseModel):
@@ -14,13 +16,14 @@ class YandexVoiceRequest(BaseModel):
     version: str
 
 @router.post("/yandex")
+@inject
 async def voice(
     request: YandexVoiceRequest,
-    ai_service: AIService = Depends(get_ai_service)
+    ai_service = Depends(Provide[ServiceContainer.ai_service]),
 ):
     text = request.request.get("original_utterance", "")
 
-    response = ai_service.process_request(text)
+    response = await ai_service.process_request(text)
 
     return {
         "version": request.version,
