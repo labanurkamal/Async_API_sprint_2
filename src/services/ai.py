@@ -66,7 +66,7 @@ class AIService:
             entity_name, entity_type = None, None
 
         es_query = await self.es_query(query=entity_name, entity_type=entity_type)
-        print('es_query', es_query)
+        logging.info(f'Запрос для Elasticsearch: {es_query}')
 
         response_template = INTENT_HANDLERS[intent]
         intent_field = IntentFields[intent].value
@@ -90,10 +90,10 @@ class AIService:
         results = []
         for item in search:
             value = getattr(item, intent_field, "Нет данных")
-            print("VALUE:", value)
+            logging.info(f"VALUE: {value}")
             if isinstance(value, list):
                 value = ", ".join([item.title for item in value])
-                print("VALUE LIST:", value)
+                logging.info(f"VALUE LIST: {value}")
             results.append(value)
 
         return ", ".join(results)
@@ -118,5 +118,6 @@ class AIService:
         entities = self.intent_ner_model.model_entities(text)
         intent = self.intent_ner_model.model_intent(text)
 
-        print(entities, intent)
+        logging.info(f'1. Сущность: {entities}, Намериние: {intent}')
+        logging.info(f'2. Имя: {tuple(entities)[0]}. Относиться: {tuple(entities)[1]}. Что нужно от {tuple(entities)[1]} нужно {intent}')
         return await self.handle_request(entities, intent)
