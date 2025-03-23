@@ -21,10 +21,11 @@ async def voice(
     request: YandexVoiceRequest,
     ai_service = Depends(Provide[ServiceContainer.ai_service]),
 ):
-    text = request.request.get("original_utterance", "")
-
-    response = await ai_service.process_request(text)
-
+    text = request.request.get("original_utterance", None)
+    if text:
+        response = await ai_service.process_request(text)
+    else:
+        response = "Задайте вопрос ?"
     return {
         "version": request.version,
         "session": request.session,
