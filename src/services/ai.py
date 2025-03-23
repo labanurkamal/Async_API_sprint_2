@@ -78,23 +78,19 @@ class AIService:
     async def get_result(self, entity_type, es_query, intent_field):
         service = await self.define_service(entity_type)
         search = await service.get_by_search(es_query)
-        logging.info(f"Ответ Elasticsearch: {search}")
 
         if not search:
             return "Данные не найдены."
 
-        # Если ищем фильмы, извлекаем их названия
-        if entity_type == "FILM":
-            return ", ".join([item.title for item in search])
-
-        # Извлекаем нужное поле, учитывая возможность списка
         results = []
         for item in search:
             value = getattr(item, intent_field, "Нет данных")
             logging.info(f"VALUE: {value}")
-            if isinstance(value, list):
-                value = ", ".join([item.title for item in value])
+
+            if isinstance(value, list):  # Если это список (например, список фильмов у режиссера)
+                value = ", ".join([getattr(v, 'title', str(v)) for v in value])
                 logging.info(f"VALUE LIST: {value}")
+
             results.append(value)
 
         return ", ".join(results)
