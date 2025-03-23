@@ -78,6 +78,7 @@ class AIService:
     async def get_result(self, entity_type, es_query, intent_field):
         service = await self.define_service(entity_type)
         search = await service.get_by_search(es_query)
+        logging.info(f"Ответ Elasticsearch: {search}")
 
         if not search:
             return "Данные не найдены."
@@ -103,6 +104,8 @@ class AIService:
             return self.person_service
         elif entity_type == EntityType.FILM:
             return self.film_service
+        else:
+            raise ValueError(f"Неизвестный тип сущности: {entity_type}")
 
     @staticmethod
     async def es_query(query, entity_type):
