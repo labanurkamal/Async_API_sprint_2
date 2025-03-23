@@ -87,11 +87,14 @@ class AIService:
             value = getattr(item, intent_field, "Нет данных")
             logging.info(f"VALUE: {value}")
 
-            if isinstance(value, list):
-                attr = 'title'
-                if entity_type == EntityType.PERSON:
-                    attr = 'full_name'
-                value = ", ".join([getattr(v, attr, str(v)) for v in value])
+            if isinstance(value, list) and value:
+                # Определяем нужное поле динамически
+                attr = "title" if hasattr(value[0], "title") else "full_name" if hasattr(value[0], "full_name") else None
+                if attr:
+                    value = ", ".join([getattr(v, attr, str(v)) for v in value])
+                else:
+                    value = ", ".join([str(v) for v in value])  # На случай других списков
+
                 logging.info(f"VALUE LIST: {value}")
 
             results.append(str(value))
