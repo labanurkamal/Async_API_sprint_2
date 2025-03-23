@@ -357,40 +357,40 @@ ALTER TABLE public.django_session OWNER TO postgres;
 
 -- Data for Name: genre; Type: TABLE DATA; Schema: content; Owner: postgres
 
-COPY content.genre (id, name, description, created, modified) FROM stdin;
-3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff	Action	\N	2021-06-16 20:14:09.309735	2021-06-16 20:14:09.309765
-120a21cf-9097-479e-904a-13dd7198c1dd	Adventure	\N	2021-06-16 20:14:09.309818	2021-06-16 20:14:09.309836
-b92ef010-5e4c-4fd0-99d6-41b6456272cd	Fantasy	\N	2021-06-16 20:14:09.309869	2021-06-16 20:14:09.309886
-6c162475-c7ed-4461-9184-001ef3d9f26e	Sci-Fi	\N	2021-06-16 20:14:09.309917	2021-06-16 20:14:09.309934
-1cacff68-643e-4ddd-8f57-84b62538081a	Drama	\N	2021-06-16 20:14:09.309965	2021-06-16 20:14:09.309981
+COPY content.genre (id, name, description, created, modified) FROM stdin WITH CSV;
+"3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff","Action",\N,"2021-06-16 20:14:09.309735","2021-06-16 20:14:09.309765"
+"120a21cf-9097-479e-904a-13dd7198c1dd","Adventure",\N,"2021-06-16 20:14:09.309818","2021-06-16 20:14:09.309836"
+"b92ef010-5e4c-4fd0-99d6-41b6456272cd","Fantasy",\N,"2021-06-16 20:14:09.309869","2021-06-16 20:14:09.309886"
+"6c162475-c7ed-4461-9184-001ef3d9f26e","Sci-Fi",\N,"2021-06-16 20:14:09.309917","2021-06-16 20:14:09.309934"
+"1cacff68-643e-4ddd-8f57-84b62538081a","Drama",\N,"2021-06-16 20:14:09.309965","2021-06-16 20:14:09.309981"
 \.
 
 -- Data for Name: film_work; Type: TABLE DATA; Schema: content; Owner: postgres
 
-COPY content.film_work (id, title, description, creation_date, rating, type, created, modified) FROM stdin;
-111e8400-e29b-41d4-a716-446655440000	Криминальное чтиво    Фильм о гангстерах и роковом чемодане    1994-10-14    8.9    movie    2025-03-21 12:00:00    2025-03-21 12:00:00
-222e8400-e29b-41d4-a716-446655440001	Интерстеллар    Фильм, вдохновленный идеями физика Кипа Торна, исследует темы выживания человечества, родительской любви и парадоксов времени через призму релятивистской физики ...    2014-11-07    8.6    movie    2025-03-21 12:00:00    2025-03-21 12:00:00
+COPY content.film_work (id, title, description, creation_date, rating, type, created, modified) FROM stdin WITH CSV;
+"111e8400-e29b-41d4-a716-446655440000","Криминальное чтиво","Фильм о гангстерах и роковом чемодане","1994-10-14",8.9,"movie","2025-03-21 12:00:00","2025-03-21 12:00:00"
+"222e8400-e29b-41d4-a716-446655440001","Интерстеллар","Фильм, вдохновленный идеями физика Кипа Торна, исследует темы выживания человечества, родительской любви и парадоксов времени через призму релятивистской физики ...","2014-11-07",8.6,"movie","2025-03-21 12:00:00","2025-03-21 12:00:00"
 \.
 
 -- Data for Name: genre_film_work; Type: TABLE DATA; Schema: content; Owner: postgres
 
-COPY content.genre_film_work (id, genre_id, film_work_id, created) FROM stdin;
-a1684d62-58c1-4784-914b-9028dcc67957	1cacff68-643e-4ddd-8f57-84b62538081a	111e8400-e29b-41d4-a716-446655440000	2025-03-21 12:00:00
-c1684d62-58c1-4784-914b-9028dcc67958	6c162475-c7ed-4461-9184-001ef3d9f26e	222e8400-e29b-41d4-a716-446655440001	2025-03-21 12:00:00
+COPY content.genre_film_work (id, genre_id, film_work_id, created) FROM stdin WITH CSV;
+"a1684d62-58c1-4784-914b-9028dcc67957","1cacff68-643e-4ddd-8f57-84b62538081a","111e8400-e29b-41d4-a716-446655440000","2025-03-21 12:00:00"
+"c1684d62-58c1-4784-914b-9028dcc67958","6c162475-c7ed-4461-9184-001ef3d9f26e","222e8400-e29b-41d4-a716-446655440001","2025-03-21 12:00:00"
 \.
 
 -- Data for Name: person; Type: TABLE DATA; Schema: content; Owner: postgres
 
-COPY content.person (id, full_name, created, modified) FROM stdin;
-550e8400-e29b-41d4-a716-446655440000	Квентин Тарантино	2025-03-21 12:00:00	2025-03-21 12:00:00
-a1b2c3d4-e5f6-7890-abcd-ef1234567890	Мэттью Макконахи	2025-03-21 12:00:00	2025-03-21 12:00:00
+COPY content.person (id, full_name, created, modified) FROM stdin WITH CSV;
+"550e8400-e29b-41d4-a716-446655440000","Квентин Тарантино","2025-03-21 12:00:00","2025-03-21 12:00:00"
+"a1b2c3d4-e5f6-7890-abcd-ef1234567890","Мэттью Макконахи","2025-03-21 12:00:00","2025-03-21 12:00:00"
 \.
 
 -- Data for Name: person_film_work; Type: TABLE DATA; Schema: content; Owner: postgres
 
-COPY content.person_film_work (id, person_id, film_work_id, role, created) FROM stdin;
-777e8400-e29b-41d4-a716-446655440000	550e8400-e29b-41d4-a716-446655440000	111e8400-e29b-41d4-a716-446655440000	director    2025-03-21 12:00:00
-888e8400-e29b-41d4-a716-446655440001	a1b2c3d4-e5f6-7890-abcd-ef1234567890	222e8400-e29b-41d4-a716-446655440001	actor    2025-03-21 12:00:00
+COPY content.person_film_work (id, person_id, film_work_id, role, created) FROM stdin WITH CSV;
+"777e8400-e29b-41d4-a716-446655440000","550e8400-e29b-41d4-a716-446655440000","111e8400-e29b-41d4-a716-446655440000","director","2025-03-21 12:00:00"
+"888e8400-e29b-41d4-a716-446655440001","a1b2c3d4-e5f6-7890-abcd-ef1234567890","222e8400-e29b-41d4-a716-446655440001","actor","2025-03-21 12:00:00"
 \.
 
 
