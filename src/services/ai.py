@@ -118,6 +118,7 @@ class AIService:
         entities = self.intent_ner_model.model_entities(text)
         intent = self.intent_ner_model.model_intent(text)
 
+        log_e = tuple(*entities.items())
         logging.info(f'1. Сущность: {entities}, Намериние: {intent}')
-        logging.info(f'2. Имя: {tuple(entities)[0]}. Относиться: {tuple(entities)[1]}. Что нужно от {tuple(entities)[1]} нужно {intent}')
+        logging.info(f'2. Имя: {log_e[0]}. Относиться: {log_e[1]}. Что нужно от {log_e[1]} нужно {intent}')
         return await self.handle_request(entities, intent)
