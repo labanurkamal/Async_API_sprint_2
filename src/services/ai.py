@@ -60,7 +60,10 @@ class AIService:
         if intent not in INTENT_HANDLERS:
             return "Я пока не умею отвечать на такие вопросы."
 
-        entity_name, entity_type = next(iter(entities.items()))
+        if entities:
+            entity_name, entity_type = next(iter(entities.items()))
+        else:
+            entity_name, entity_type = None, None
 
         es_query = await self.es_query(query=entity_name, entity_type=entity_type)
         print('es_query', es_query)

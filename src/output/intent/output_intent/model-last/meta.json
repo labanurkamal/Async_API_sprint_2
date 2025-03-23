@@ -18,12 +18,12 @@
   },
   "labels":{
     "textcat":[
-      "film_description",
       "director_info",
-      "actor_movies",
-      "actor_info",
+      "film_description",
       "writer_info",
       "director_movies",
+      "actor_movies",
+      "actor_info",
       "film_rating"
     ]
   },
@@ -47,22 +47,12 @@
     "cats_macro_f":1.0,
     "cats_macro_auc":1.0,
     "cats_f_per_type":{
-      "film_description":{
-        "p":1.0,
-        "r":1.0,
-        "f":1.0
-      },
       "director_info":{
         "p":1.0,
         "r":1.0,
         "f":1.0
       },
-      "actor_movies":{
-        "p":1.0,
-        "r":1.0,
-        "f":1.0
-      },
-      "actor_info":{
+      "film_description":{
         "p":1.0,
         "r":1.0,
         "f":1.0
@@ -77,12 +67,22 @@
         "r":1.0,
         "f":1.0
       },
+      "actor_movies":{
+        "p":1.0,
+        "r":1.0,
+        "f":1.0
+      },
+      "actor_info":{
+        "p":1.0,
+        "r":1.0,
+        "f":1.0
+      },
       "film_rating":{
         "p":1.0,
         "r":1.0,
         "f":1.0
       }
     },
-    "textcat_loss":0.0000000801
+    "textcat_loss":0.0000000818
   }
 }
